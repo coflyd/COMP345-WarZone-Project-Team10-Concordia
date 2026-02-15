@@ -4,12 +4,13 @@
 #include <iostream>
 #include "Map.h"
 #include "Orders.h"
+#include "Cards.h"
 
 class Player {
 private:
     std::string* name;
     std::vector<Country*>* owned;
-    void* hand;
+    Hand* hand;
     OrdersList* orders;
 
 public:
@@ -24,6 +25,7 @@ public:
     void issueOrder();
 
     OrdersList* getOrders() const;
+    Hand* getHand() const;
     std::string getName() const;
 
     friend std::ostream& operator<<(std::ostream& out, const Player& p);

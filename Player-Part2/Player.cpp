@@ -8,14 +8,14 @@ void Player::issueOrder() {
 Player::Player(const std::string& n) {
     name = new std::string(n);
     owned = new std::vector<Country*>();
-    hand = nullptr;
+    hand = new Hand();
     orders = new OrdersList();
 }
 
 Player::Player(const Player& other) {
     name = new std::string(*other.name);
     owned = new std::vector<Country*>(*other.owned);
-    hand = nullptr;
+    hand = new Hand(*other.hand);
     orders = new OrdersList(*other.orders);
 }
 
@@ -23,18 +23,20 @@ Player& Player::operator=(const Player& other) {
     if (this == &other) return *this;
     delete name;
     delete owned;
+    delete hand;
     delete orders;
 
     name = new std::string(*other.name);
     owned = new std::vector<Country*>(*other.owned);
+    hand = new Hand(*other.hand);
     orders = new OrdersList(*other.orders);
-    hand = nullptr;
     return *this;
 }
 
 Player::~Player() {
     delete name;
     delete owned;
+    delete hand;
     delete orders;
 }
 
@@ -56,6 +58,10 @@ OrdersList* Player::getOrders() const {
 
 std::string Player::getName() const {
     return *name;
+}
+
+Hand* Player::getHand() const {
+    return hand;
 }
 
 std::ostream& operator<<(std::ostream& out, const Player& p) {
