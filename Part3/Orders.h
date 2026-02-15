@@ -1,67 +1,67 @@
-// ========================= Orders.h =========================
-// (Declarations only. All function bodies are in Orders.cpp)
-
 #pragma once
 
 #include <iostream>
 #include <string>
 #include <vector>
 
-// ------------------------------------------------------------
-// Order (abstract base class)
-//
-// Why abstract?
-// - We never create a plain "Order".
-// - We only create specific orders (Deploy, Advance, etc.).
-// - validate/execute depend on the type, so they are pure virtual.
-// ------------------------------------------------------------
+/*
+    ===========================
+    Order (Abstract Base Class)
+    ===========================
+    - Parent class for all orders.
+    - Has a description string and an effect string.
+    - validate() checks if an order is allowed/valid.
+    - execute() must validate first, then sets an effect.
+    - clone() is used for deep copying (Rule of 3 in OrdersList).
+*/
 class Order {
-public:
-    Order();
-    Order(const std::string& description);
+protected:
+    // All data members are pointers (as required by the assignment)
+    std::string* description;  // what the order is (ex: "Deploy to Alaska (5)")
+    std::string* effect;       // what happened after executing (ex: "Deployed 5 armies...")
+    bool* executed;            // tracks if execute() was called successfully
 
-    // Rule of 3: we use new/delete -> we need copy ctor, assignment, destructor
+    // Helper used by derived classes to store the effect and mark executed = true
+    void setEffect(const std::string& newEffect);
+
+public:
+    // Constructors / Rule of 3
+    Order();
+    explicit Order(const std::string& desc);
     Order(const Order& other);
     Order& operator=(const Order& other);
     virtual ~Order();
 
-    // Each specific order decides if it is valid and what happens on execute
+    // Pure virtual functions -> every derived class MUST implement them
     virtual bool validate() const = 0;
     virtual void execute() = 0;
 
-    // OrdersList stores Order*.
-    // clone() lets us deep-copy the REAL derived object (Deploy/Bomb/etc.).
+    // Used for deep copying through base pointers
     virtual Order* clone() const = 0;
 
-    // Simple getters so driver and << can print info
+    // Getters used in operator<<
     std::string getDescription() const;
     std::string getEffect() const;
+    bool wasExecuted() const;
 
-protected:
-    // Derived classes use these to update their base text/effect
-    void setDescription(const std::string& d);
-    void setEffect(const std::string& e);
-
-private:
-    // Using pointers to follow the course “class-type members as pointers” style.
-    // This also forces us to practice deep copying.
-    std::string* description;
-    std::string* effect;
+    // Stream insertion to print order info
+    friend std::ostream& operator<<(std::ostream& os, const Order& o);
 };
 
-// Print format: "description | Effect: ..."
-std::ostream& operator<<(std::ostream& os, const Order& o);
-
-// ------------------------------------------------------------
-// Concrete Orders (6 types required)
-// For now, validate() is “basic checks” because i dont have the full game logic yet 
-// ------------------------------------------------------------
-
+/*
+    ===========================
+    Deploy Order
+    ===========================
+    Meaning: Add armies to a target territory (placeholder in A1)
+*/
 class Deploy : public Order {
+private:
+    std::string* targetTerritory;
+    int* armies;
+
 public:
     Deploy();
-    Deploy(const std::string& targetTerritory, int armies);
-
+    Deploy(const std::string& target, int armies);
     Deploy(const Deploy& other);
     Deploy& operator=(const Deploy& other);
     ~Deploy() override;
@@ -70,16 +70,24 @@ public:
     void execute() override;
     Order* clone() const override;
 
-private:
-    std::string* targetTerritory;
-    int armies;
+    friend std::ostream& operator<<(std::ostream& os, const Deploy& o);
 };
 
+/*
+    ===========================
+    Advance Order
+    ===========================
+    Meaning: Move armies from one territory to another (placeholder in A1)
+*/
 class Advance : public Order {
+private:
+    std::string* fromTerritory;
+    std::string* toTerritory;
+    int* armies;
+
 public:
     Advance();
     Advance(const std::string& from, const std::string& to, int armies);
-
     Advance(const Advance& other);
     Advance& operator=(const Advance& other);
     ~Advance() override;
@@ -88,17 +96,22 @@ public:
     void execute() override;
     Order* clone() const override;
 
-private:
-    std::string* fromTerritory;
-    std::string* toTerritory;
-    int armies;
+    friend std::ostream& operator<<(std::ostream& os, const Advance& o);
 };
 
+/*
+    ===========================
+    Bomb Order
+    ===========================
+    Meaning: Bomb a territory (placeholder in A1)
+*/
 class Bomb : public Order {
+private:
+    std::string* targetTerritory;
+
 public:
     Bomb();
-    Bomb(const std::string& targetTerritory);
-
+    explicit Bomb(const std::string& target);
     Bomb(const Bomb& other);
     Bomb& operator=(const Bomb& other);
     ~Bomb() override;
@@ -107,15 +120,22 @@ public:
     void execute() override;
     Order* clone() const override;
 
-private:
-    std::string* targetTerritory;
+    friend std::ostream& operator<<(std::ostream& os, const Bomb& o);
 };
 
+/*
+    ===========================
+    Blockade Order
+    ===========================
+    Meaning: Blockade a territory (placeholder in A1)
+*/
 class Blockade : public Order {
+private:
+    std::string* targetTerritory;
+
 public:
     Blockade();
-    Blockade(const std::string& targetTerritory);
-
+    explicit Blockade(const std::string& target);
     Blockade(const Blockade& other);
     Blockade& operator=(const Blockade& other);
     ~Blockade() override;
@@ -124,15 +144,24 @@ public:
     void execute() override;
     Order* clone() const override;
 
-private:
-    std::string* targetTerritory;
+    friend std::ostream& operator<<(std::ostream& os, const Blockade& o);
 };
 
+/*
+    ===========================
+    Airlift Order
+    ===========================
+    Meaning: Move armies between any two territories (placeholder in A1)
+*/
 class Airlift : public Order {
+private:
+    std::string* fromTerritory;
+    std::string* toTerritory;
+    int* armies;
+
 public:
     Airlift();
     Airlift(const std::string& from, const std::string& to, int armies);
-
     Airlift(const Airlift& other);
     Airlift& operator=(const Airlift& other);
     ~Airlift() override;
@@ -141,17 +170,23 @@ public:
     void execute() override;
     Order* clone() const override;
 
-private:
-    std::string* fromTerritory;
-    std::string* toTerritory;
-    int armies;
+    friend std::ostream& operator<<(std::ostream& os, const Airlift& o);
 };
 
+/*
+    ===========================
+    Negotiate Order
+    ===========================
+    Meaning: Two players cannot attack each other (placeholder in A1)
+*/
 class Negotiate : public Order {
+private:
+    std::string* playerA;
+    std::string* playerB;
+
 public:
     Negotiate();
-    Negotiate(const std::string& playerA, const std::string& playerB);
-
+    Negotiate(const std::string& a, const std::string& b);
     Negotiate(const Negotiate& other);
     Negotiate& operator=(const Negotiate& other);
     ~Negotiate() override;
@@ -160,47 +195,34 @@ public:
     void execute() override;
     Order* clone() const override;
 
-private:
-    std::string* playerA;
-    std::string* playerB;
+    friend std::ostream& operator<<(std::ostream& os, const Negotiate& o);
 };
 
-// ------------------------------------------------------------
-// OrdersList
-//
-// Owns the Order* pointers.
-// That means:
-// - destructor must delete them
-// - remove() must delete one
-// - copy/assignment must deep copy (clone each order)
-// ------------------------------------------------------------
+/*
+    ===========================
+    OrdersList
+    ===========================
+    - Stores a list of Order pointers (polymorphism).
+    - remove(index): deletes the order at index and removes it from the list.
+    - move(from,to): reorders the list.
+    - Implements deep copy using Order::clone().
+*/
 class OrdersList {
+private:
+    std::vector<Order*>* orders;
+
 public:
     OrdersList();
     OrdersList(const OrdersList& other);
     OrdersList& operator=(const OrdersList& other);
     ~OrdersList();
 
-    // Takes ownership of the pointer (caller should NOT delete after adding)
-    void add(Order* o);
-
-    // Deletes the object at index, then removes it from the vector
-    void remove(int index);
-
-    // Reorders an existing order
-    void move(int from, int to);
+    void add(Order* order);
+    bool remove(int index);
+    bool move(int fromIndex, int toIndex);
 
     int size() const;
-
-    // Returns raw pointer for access (OrdersList still owns it)
     Order* at(int index) const;
 
-private:
-    // Pointer to vector to match “class-type members as pointers” style
-    std::vector<Order*>* orders;
-
-    // Helper to avoid repeating deletion loops
-    void clearAndDelete();
+    friend std::ostream& operator<<(std::ostream& os, const OrdersList& ol);
 };
-
-std::ostream& operator<<(std::ostream& os, const OrdersList& ol);
