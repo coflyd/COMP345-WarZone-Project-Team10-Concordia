@@ -7,23 +7,13 @@
 #include <unordered_set>
 #include <utility>
 #include <algorithm>
+#include <random>
 
 using namespace std;
 
 
 // ======== PLAYER ========
-Player::Player(const int id, const std::string pseudo) {
-	this->id = id;
-	this->pseudo = pseudo;
-}
-
-int Player::getId() const {
-	return id;
-}
-
-const std::string& Player::getPseudo() const {
-	return pseudo;
-}
+// REMOVED
 
 // ====== MAPLOADER =======
 
@@ -39,7 +29,7 @@ MapLoader::MapLoader(const std::string &mapFileName) {
 
 	std::string line;
 	std::string currentSection;
-	//int continent_number = 1;
+	int continent_number = 1;
 
 	while (getline(mapFile, line)) {
 		if (!line.empty() && line.back() == '\r') {
@@ -238,8 +228,7 @@ Map::Map(std::unique_ptr<MapLoader> mapLoader) {
 }
 
 // Copy constructor Map
-Map::Map(const Map &other) :
-	//mapObjects(std::make_unique<MapLoader>(*other.mapObjects)) {
+Map::Map(const Map &other) {
 	// Deep copy countryNode
 	for (const auto& [id, country] : other.countryNode) {
 		countryNode[id] = std::make_unique<Country>(*country);
@@ -296,8 +285,8 @@ void Map::display() {
 		std::cout << "ID: " << id << ", Name: " << country->name
 				<< ", Continent: " << country->continentNumber 
 				<< ", Coords: (" << country->x << ", " << country->y << ")" ; 
-		if (country->player != nullptr) {
-			cout << ", Player: " << country->player->getPseudo();
+		if (country->playerName != nullptr) {
+			cout << ", Player: " << *country->playerName;
 		}
 		cout << std::endl;
 	}
@@ -466,31 +455,26 @@ bool Map::validate() {
 	}
 }
 
-void Map::initialCountryDistribution(
-		std::vector<std::unique_ptr<Player>> &players) {
+void Map::initialCountryDistribution(int numPlayers) {
 	int i = 0;
-	int nbPlayers = players.size();
 	for (const auto& [id, country] : this->countryNode) {
-		country->player = players[i % nbPlayers].get();
+		country->playerName = new std::string("Player_" + std::to_string((i % numPlayers) + 1));
 		i++;
 	}
-
 }
 
-void Map::initialRandomCountryDistribution(
-		std::vector<std::unique_ptr<Player>> &players) {
+void Map::initialRandomCountryDistribution(int numPlayers) {
 	int i;
-	int nbPlayers = players.size();
 	int nbCountries = this->countryNode.size();
 	std::vector<int> countryBag;
 	for (i = 1; i <= nbCountries; i++) {
 		countryBag.push_back(i);
 	}
 	i = 0;
-	std::shuffle(countryBag.begin(), countryBag.end(), std::mt19937 {
+	std::shuffle(countryBag.begin(), countryBag.end(), std::mt19937{
 			std::random_device { }() });
 	for (const int idCountry : countryBag) {
-		this->countryNode[idCountry]->player = players[i % nbPlayers].get();
+		this->countryNode[idCountry]->playerName = new std::string("Player_" + std::to_string((i % numPlayers) + 1));
 		i++;
 	}
 }

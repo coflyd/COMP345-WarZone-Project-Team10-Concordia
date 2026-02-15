@@ -7,17 +7,6 @@
 #include <vector>
 #include <memory>
 
-class Player {
-private:
-	int id;
-	std::string pseudo;
-
-public:
-	Player(const int id, const std::string pseudo);
-	int getId() const;
-	const std::string& getPseudo() const;
-};
-
 struct Continent {
 	int id;
 	std::string name;
@@ -31,7 +20,7 @@ struct Country {
 	int continentNumber;
 	int x;
 	int y;
-	Player *player;
+	std::string* playerName;
 	std::vector<int> armies;
 };
 
@@ -39,13 +28,13 @@ class MapLoader {
 private : 
 	std::vector<std::string> files; 
 	std::vector<std::unique_ptr<Continent>> continents; 
-	std::vector<std::uniqu_ptr<Continent>> countries; 
-	std::vector<int, std::vector<int>> borders; 
+	std::vector<std::unique_ptr<Country>> countries;
+	std::map<int, std::vector<int>> borders;
 
 public : 
 	MapLoader(const std::string &mapFileName);
 
-	const std::vector<int, std::vector<int>> &getBorders();
+	const std::map<int, std::vector<int>>& getBorders();
 	const std::vector<std::unique_ptr<Continent>> &getContinents(); 
 	const std::vector<std::unique_ptr<Country>> &getCountries();
 
@@ -74,8 +63,8 @@ public:
 			const std::map<int, std::vector<int>> &edges);
 	bool isEachContinentIsGraphsConnected();
 	bool isEachCountryBelongsToOneAndOnlyOneContinent();
-	void initialCountryDistribution(
-			std::vector<std::unique_ptr<Player>> &players);
+	void initialCountryDistribution(int numPlayers);
+	void initialRandomCountryDistribution(int numPlayers);
 };
 
 #endif /* MAP_H_ */
