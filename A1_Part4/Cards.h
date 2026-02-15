@@ -3,11 +3,9 @@
 #include <iostream>
 
 class Player;
-class Order;
-class OrdersList;
 class Deck;
 
-enum class CardType{
+enum class CardType {
     bomb,
     reinforcement,
     blockade,
@@ -15,35 +13,38 @@ enum class CardType{
     diplomacy
 };
 
-class Card{
+class Card {
 private:
     CardType type;
+
 public:
     Card();
     Card(CardType t);
     Card(const Card& other);
     Card& operator=(const Card& other);
     ~Card();
+
     void play(Player* player, Deck* deck);
-    CardType getType()const ;
+    CardType getType() const;
 
+    friend std::ostream& operator<<(std::ostream& out, const Card& card);
 };
-
 
 class Deck {
 private:
     std::vector<Card*>* cards;
-    
+
 public:
     Deck();
     Deck(const Deck& other);
     Deck& operator=(const Deck& other);
     ~Deck();
-    
+
     Card* draw();
     void returnCard(Card* card);
     int size() const;
 
+    friend std::ostream& operator<<(std::ostream& out, const Deck& deck);
 };
 
 class Hand {
@@ -61,4 +62,5 @@ public:
     int size() const;
     const std::vector<Card*>* getCards() const;
 
+    friend std::ostream& operator<<(std::ostream& out, const Hand& hand);
 };
