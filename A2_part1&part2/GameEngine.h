@@ -5,11 +5,11 @@
 #include <vector>
 #include <map>
 #include <array>
-#include <fstream>
 #include "Map.h"
 #include "Player.h"
-#include "CommandProcessing.h" 
+#include "CommandProcessing.h"  // Command + CommandProcessor
 
+// WarZone: holds the entire game state
 struct WarZone {
 	Map* map;
 	std::vector<Player*> players;
@@ -20,6 +20,7 @@ struct WarZone {
 	~WarZone();
 };
 
+// State: represents a game phase (start, maploaded, etc.)
 class State {
 private:
 	std::string name;
@@ -33,10 +34,10 @@ public:
 	~State() = default;
 
 	std::string getName() const;
-
 	friend std::ostream& operator<<(std::ostream& os, const State& s);
 };
 
+// GameEngine: controls game flow
 class GameEngine {
 private:
 	static const std::string MAPS_DIRECTORY;
@@ -68,7 +69,7 @@ public:
 	void displayOwnedCountries();
 	void drawInitialCards(int nbCards);
 
-	// Part 3 main game loop
+	// Part 3: Main Game Loop
 	void mainGameLoop();
 	void reinforcementPhase();
 	void issueOrdersPhase();
