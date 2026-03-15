@@ -8,6 +8,7 @@
 #include <fstream>
 #include "Map.h"
 #include "Player.h"
+#include "CommandProcessing.h" 
 
 struct WarZone {
 	Map* map;
@@ -35,28 +36,6 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, const State& s);
 };
-
-class Command {
-private:
-	std::string type;
-	std::string effect;
-
-public:
-	static const std::array<std::string, 10> allowedCommands;
-
-	Command(const std::string& cmdType);
-	Command(const Command& other);
-	Command& operator=(const Command& other);
-	~Command() = default;
-
-	std::string getType() const;
-	std::string getEffect() const;
-	void saveEffect(const std::string& e);
-
-	friend std::ostream& operator<<(std::ostream& os, const Command& c);
-};
-
-class CommandProcessor;
 
 class GameEngine {
 private:
@@ -98,52 +77,6 @@ public:
 	void removeDefeatedPlayers();
 
 	friend std::ostream& operator<<(std::ostream& os, const GameEngine& ge);
-};
-
-class CommandProcessor {
-private:
-	std::vector<Command*> commands;
-	GameEngine* gameEngine;
-	virtual void readCommand();
-public:
-	CommandProcessor();
-	CommandProcessor(GameEngine* engine);
-	CommandProcessor(const CommandProcessor& other);
-	CommandProcessor& operator=(const CommandProcessor& other);
-	virtual ~CommandProcessor();
-
-	bool saveCommand(const std::string& commandType);
-	virtual std::string getCommandFromConsole();
-	Command* getCommand();
-	bool validate(const std::string& commandType,
-		const State& currentState) const;
-	const std::vector<Command*>& getCommands() const;
-
-	friend std::ostream& operator<<(std::ostream& os,
-		const CommandProcessor& cp);
-};
-
-class FileLineReader {
-private:
-	std::ifstream file;
-
-public:
-	FileLineReader(const std::string& filename);
-	~FileLineReader();
-
-	std::string readLine();
-	const std::ifstream& getFile() const;
-};
-
-class FileCommandProcessorAdapter : public CommandProcessor {
-private:
-	FileLineReader* fileReader;
-	void readCommand() override;
-public:
-	FileCommandProcessorAdapter(const std::string& filename);
-	~FileCommandProcessorAdapter();
-	std::string getCommandFromConsole() override;
-	bool hasMoreCommands() const;
 };
 
 #endif
