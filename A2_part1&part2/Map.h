@@ -20,7 +20,7 @@ struct Country {
     int x;
     int y;
     std::string *playerName;
-    std::vector<int> armies;
+    int armies = 0;
 };
 
 class MapLoader {
@@ -52,6 +52,7 @@ private:
     std::map<int, std::vector<int>> neighboursEdge;
 
 public:
+    bool areAdjacent(int countryId1, int countryId2) const;
     Map(MapLoader *mapObjects);
     Map(const Map &other);
     Map& operator=(const Map &other);

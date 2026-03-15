@@ -44,8 +44,7 @@ int main() {
 		// Give each territory 10 armies so issueOrder can move them
 		for (Player *p : players) {
 			for (Country *c : p->getOwnedCountries()) {
-				if (c->armies.empty()) c->armies.push_back(10);
-				else c->armies[0] = 10;
+				c->armies = 10;
 			}
 		}
 
@@ -85,9 +84,9 @@ int main() {
 		Country *t2 = map.getCountryById(2);
 		Country *t3 = map.getCountryById(3);
 
-		if (t1) { t1->armies.clear(); t1->armies.push_back(10); alice->addCountry(t1); }
-		if (t2) { t2->armies.clear(); t2->armies.push_back(2);  alice->addCountry(t2); }
-		if (t3) { t3->armies.clear(); t3->armies.push_back(5);  bob->addCountry(t3);   }
+		if (t1) { t1->armies = 10; alice->addCountry(t1); }
+		if (t2) { t2->armies = 2;  alice->addCountry(t2); }
+		if (t3) { t3->armies = 5;  bob->addCountry(t3); }
 
 		// Give Alice a bomb card
 		Deck deck;

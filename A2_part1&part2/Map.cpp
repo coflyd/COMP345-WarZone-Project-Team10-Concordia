@@ -131,7 +131,14 @@ MapLoader::MapLoader(const MapLoader &other) :
 		countries.push_back(new Country(*country));
 	}
 }
-
+bool Map::areAdjacent(int countryId1, int countryId2) const {
+	auto it = neighboursEdge.find(countryId1);
+	if (it == neighboursEdge.end()) return false;
+	for (int neighbor : it->second) {
+		if (neighbor == countryId2) return true;
+	}
+	return false;
+}
 // MapLoader assignment operator
 MapLoader& MapLoader::operator=(const MapLoader &other) {
 	if (this != &other) {
