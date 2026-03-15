@@ -190,7 +190,7 @@ int main(int argc, char *argv[]) {
 		std::cout << "\nCurrent State: " << engine->getCurrentState() << "\n";
 
 		if (fileMode && !endOfFile) {
-			input = engine->commandProcessor->getCommandFromConsole();
+			input = engine->commandProcessor->getCommand()->getType();
 			if (input.empty()) {
 				std::cout
 						<< "No more commands in file. Switching to console mode.\n";
