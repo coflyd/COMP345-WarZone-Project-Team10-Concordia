@@ -10,83 +10,89 @@
 class GameEngine;
 class State;
 
+// Forward declaration for the tournament parser (Part 3 Assignment 3)
+bool parseTournamentCommand(const std::string &cmd,
+        std::vector<std::string> &maps,
+        std::vector<std::string> &strategies,
+        int &numGames,
+        int &maxTurns);
 
 class Command {
 private:
-    std::string* type;      
-    std::string* effect;    
+    std::string* type;
+    std::string* effect;
 
 public:
-    static const std::array<std::string, 11> allowedCommands;
+    // "tournament" added for Assignment 3 Part 2
+    static const std::array<std::string, 12> allowedCommands;
 
-	explicit Command(const std::string& cmdType);
+    explicit Command(const std::string& cmdType);
     Command(const Command& other);
     Command& operator=(const Command& other);
-    ~Command();  
+    ~Command();
 
-	std::string getType() const;
-	std::string getEffect() const;
-	void saveEffect(const std::string &e);
+    std::string getType() const;
+    std::string getEffect() const;
+    void saveEffect(const std::string &e);
 
-	friend std::ostream& operator<<(std::ostream &os, const Command &c);
-
+    friend std::ostream& operator<<(std::ostream &os, const Command &c);
 };
 
 class CommandProcessor {
 protected:
-	std::vector<Command*>* commands;
-	GameEngine *gameEngine;
-	virtual void readCommand();
+    std::vector<Command*>* commands;
+    GameEngine *gameEngine;
+    virtual void readCommand();
     bool saveCommand(const std::string& commandType);
 public:
-	CommandProcessor();
-	CommandProcessor(GameEngine *engine);
-	CommandProcessor(const CommandProcessor &other);
-	CommandProcessor& operator=(const CommandProcessor &other);
-	virtual ~CommandProcessor();
+    CommandProcessor();
+    CommandProcessor(GameEngine *engine);
+    CommandProcessor(const CommandProcessor &other);
+    CommandProcessor& operator=(const CommandProcessor &other);
+    virtual ~CommandProcessor();
 
-	Command* getCommand();
-	bool validate(const std::string &commandType,
-			const State &currentState) const;
-	const std::vector<Command*>& getCommands() const;
+    Command* getCommand();
+    bool validate(const std::string &commandType,
+            const State &currentState) const;
+    const std::vector<Command*>& getCommands() const;
     void setGameEngine(GameEngine* engine);
 
-	friend std::ostream& operator<<(std::ostream &os,
-			const CommandProcessor &cp);
+    friend std::ostream& operator<<(std::ostream &os,
+            const CommandProcessor &cp);
     friend class GameEngine;
 };
 
 class FileLineReader {
 private:
-    std::string*   filename;
-	std::ifstream file;
+    std::string*  filename;
+    std::ifstream file;
     int* linesRead;
 public:
-	explicit FileLineReader(const std::string& filename);
+    explicit FileLineReader(const std::string& filename);
     FileLineReader(const FileLineReader& other);
     FileLineReader& operator=(const FileLineReader& other);
-	~FileLineReader();
+    ~FileLineReader();
 
-	std::string readLine();
+    std::string readLine();
     bool isOpen() const;
-	const std::ifstream* getFile() const;
+    const std::ifstream* getFile() const;
 
     friend std::ostream& operator<<(std::ostream& os, const FileLineReader& flr);
 };
 
 class FileCommandProcessorAdapter: public CommandProcessor {
 private:
-	FileLineReader *fileReader;
+    FileLineReader *fileReader;
 protected:
     void readCommand() override;
 public:
-	 explicit FileCommandProcessorAdapter(const std::string& filename);
+    explicit FileCommandProcessorAdapter(const std::string& filename);
     FileCommandProcessorAdapter(const FileCommandProcessorAdapter& other);
     FileCommandProcessorAdapter& operator=(const FileCommandProcessorAdapter& other);
     ~FileCommandProcessorAdapter() override;
 
-	bool hasMoreCommands() const;
- 
+    bool hasMoreCommands() const;
+
     friend std::ostream& operator<<(std::ostream& os, const FileCommandProcessorAdapter& a);
 };
 
